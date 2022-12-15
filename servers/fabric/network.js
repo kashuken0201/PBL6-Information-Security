@@ -33,7 +33,7 @@ function getConnectionMaterial(isManufacturer, isConsumer) {
     return connectionMaterial;
 }
 
-exports.connect = async (isManufacturer, isConsumer, userID) => {
+exports.connect = async (isManufacturer, isConsumer, userID, contractName) => {
     const gateway = new Gateway();
 
     try {
@@ -51,7 +51,7 @@ exports.connect = async (isManufacturer, isConsumer, userID) => {
         });
 
         const network = await gateway.getNetwork(process.env.CHANNEL);
-        const contract = await network.getContract(process.env.CONTRACT);
+        const contract = await network.getContract(contractName);
         console.log('Connected to fabric network successly.');
 
         const networkObj = { gateway, network, contract };
@@ -64,53 +64,38 @@ exports.connect = async (isManufacturer, isConsumer, userID) => {
     }
 };
 
+// exports.queryChaincode = async (networkObj, ...funcAndArgs) => {
+//     try {
+//         console.log(`Query parameter: ${funcAndArgs}`);
+//         const funcAndArgsStrings = funcAndArgs.map(elem => String(elem));
+//         let response = await networkObj.contract.evaluateTransaction(...funcAndArgsStrings);
+//         response = BlockDecoder.decodeTransaction(response);
+//         console.log(`Transaction ${funcAndArgs} has been evaluated: ${response}`);
+
+//         return response;
+//     } catch (err) {
+//         console.error(`Failed to evaluate transaction: ${err}`);
+//         return { status: 500, error: err.toString() };
+//     } finally {
+//         if (networkObj.gatway) {
+//             await networkObj.gateway.disconnect();
+//         }
+//     }
+// };
+
 exports.queryChaincode = async (networkObj, ...funcAndArgs) => {
     try {
         console.log(`Query parameter: ${funcAndArgs}`);
         const funcAndArgsStrings = funcAndArgs.map(elem => String(elem));
         let response = await networkObj.contract.evaluateTransaction(...funcAndArgsStrings);
-        response = BlockDecoder.decodeTransaction(response);
-        console.log(`Transaction ${funcAndArgs} has been evaluated: ${response}`);
-
-        return response;
-    } catch (err) {
-        console.error(`Failed to evaluate transaction: ${err}`);
-        return { status: 500, error: err.toString() };
-    } finally {
-        if (networkObj.gatway) {
-            await networkObj.gateway.disconnect();
-        }
-    }
-};
-
-exports.queryChaincodee = async (networkObj, ...funcAndArgs) => {
-    try {
-        console.log(`Query parameter: ${funcAndArgs}`);
-        const funcAndArgsStrings = funcAndArgs.map(elem => String(elem));
-        let response = await networkObj.contract.evaluateTransaction(...funcAndArgsStrings);
         // response = BlockDecoder.decode(response);
+
         const fs = require('fs')
         fs.writeFileSync('./app/data/blockData.block', response)
+        const { exec } = require('child_process');
+        exec('sh ./app/block-decoder.sh')
 
-        let runScript = () => new Promise((resolve, reject) => {
-            
-            const { exec } = require('child_process');
-            exec('sh ./app/block-decoder.sh',
-                (error, stdout, stderr) => {
-                    console.log(stdout);
-                    console.log(stderr);
-                    if (error !== null) {
-                        console.log(`exec error: ${error}`);
-                        reject(false)
-                    } else {
-                        resolve(true)
-                    }
-                });
-        })
-
-        result = await runScript()
-        result = fs.readFileSync('./app/data/block.json')
-
+        response = fs.readFileSync('./app/data/block.json')
         response = JSON.parse(result.toString('utf-8'))
         console.log(`Transaction ${funcAndArgs} has been evaluated: ${response}`);
 
@@ -122,37 +107,6 @@ exports.queryChaincodee = async (networkObj, ...funcAndArgs) => {
         if (networkObj.gatway) {
             await networkObj.gateway.disconnect();
         }
-    }
-};
-
-exports.connectChaincode = async (isManufacturer, isConsumer) => {
-    const gateway = new Gateway();
-
-    try {
-        const { walletPath, connection } = getConnectionMaterial(isManufacturer, isConsumer);
-        const wallet = new FileSystemWallet(walletPath);
-        const userExists = await wallet.exists('admin');
-        if (!userExists) {
-            console.error(`An identity for the user admin does not exist in the wallet. Register admin first`);
-            return { status: 401, error: 'User identity does not exist in the wallet.' };
-        }
-        await gateway.connect(connection, {
-            wallet,
-            identity: 'admin',
-            discovery: { enabled: true, asLocalhost: Boolean(process.env.AS_LOCALHOST) },
-        });
-
-        const network = await gateway.getNetwork(process.env.CHANNEL);
-        const contract = await network.getContract('qscc');
-        console.log('Connected to fabric network successly.');
-
-        const networkObj = { gateway, network, contract };
-
-        return networkObj;
-    } catch (err) {
-        console.error(`Fail to connect network: ${err}`);
-        await gateway.disconnect();
-        return { status: 500, error: err.toString() };
     }
 };
 

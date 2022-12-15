@@ -4,7 +4,7 @@ const apiResponse = require('../utils/apiResponse.js');
 exports.orderProduct = async information => {
     const { productId, id } = information;
 
-    const networkObj = await network.connect(false, true, id);
+    const networkObj = await network.connect(false, true, id, 'supply');
     const contractRes = await network.invoke(networkObj, 'orderProduct', id, productId);
 
     // const error = networkObj.error || contractRes.error;
@@ -21,7 +21,7 @@ exports.orderProduct = async information => {
 exports.sellProduct = async information => {
     const { productId, id } = information;
 
-    const networkObj = await network.connect(true, false, id);
+    const networkObj = await network.connect(true, false, id, 'supply');
     const contractRes = await network.invoke(networkObj, 'sellToConsumer', productId);
 
     // const error = networkObj.error || contractRes.error;
@@ -38,7 +38,7 @@ exports.sellProduct = async information => {
 exports.deliverProduct = async information => {
     const { productId, id } = information;
 
-    const networkObj = await network.connect(false, true, id);
+    const networkObj = await network.connect(false, true, id, 'supply');
     const contractRes = await network.invoke(networkObj, 'deliveredProduct', productId);
 
     // const error = networkObj.error || contractRes.error;
@@ -55,7 +55,7 @@ exports.deliverProduct = async information => {
 exports.getAllTransact = async (isManufacturer, isConsumer, information) => {
     const { id } = information;
 
-    const networkObj = await network.connect(isManufacturer, isConsumer, id);
+    const networkObj = await network.connect(isManufacturer, isConsumer, id, 'supply');
     const contractRes = await network.query(networkObj, 'queryAll', 'Product');
 
     // const error = networkObj.error || contractRes.error;

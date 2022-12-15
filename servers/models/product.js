@@ -4,9 +4,9 @@ const network = require('../fabric/network.js');
 exports.createProduct = async information => {
     const { name, id, price, manuName, desc } = information;
 
-    const networkObj = await network.connect(true, false, id);
+    const networkObj = await network.connect(true, false, id, 'supply');
     const contractRes = await network.invoke(networkObj, 'createProduct', name, id, manuName, price, desc);
-    // console.log(contractRes);
+
     // const error = networkObj.error || contractRes.error;
     // if (error) {
     //     const status = networkObj.status || contractRes.status;
@@ -23,7 +23,7 @@ exports.createProduct = async information => {
 exports.updateProduct = async information => {
     const { productId, name, id, price, desc } = information;
 
-    const networkObj = await network.connect(true, false, id);
+    const networkObj = await network.connect(true, false, id, 'supply');
     const contractRes = await network.invoke(networkObj, 'updateProduct', productId, id, name, price, desc);
 
     // const error = networkObj.error || contractRes.error;
@@ -43,7 +43,7 @@ exports.updateProduct = async information => {
 exports.getProductById = async (isManufacturer, isConsumer, information) => {
     const { productId, id } = information;
 
-    const networkObj = await network.connect(isManufacturer, isConsumer, id);
+    const networkObj = await network.connect(isManufacturer, isConsumer, id, 'supply');
     const contractRes = await network.query(networkObj, 'queryAsset', productId);
 
     // const error = networkObj.error || contractRes.error;
@@ -62,7 +62,7 @@ exports.getProductById = async (isManufacturer, isConsumer, information) => {
 exports.getAllProducts = async (isManufacturer, isConsumer, information) => {
     const { id } = information;
 
-    const networkObj = await network.connect(isManufacturer, isConsumer, id);
+    const networkObj = await network.connect(isManufacturer, isConsumer, id, 'supply');
     const contractRes = await network.query(networkObj, 'queryAll', 'Product');
 
     // const error = networkObj.error || contractRes.error;
@@ -85,7 +85,7 @@ exports.getAllProducts = async (isManufacturer, isConsumer, information) => {
 exports.getLog = async (isManufacturer, isConsumer, information) => {
     const { productId, id } = information;
 
-    const networkObj = await network.connect(isManufacturer, isConsumer, id);
+    const networkObj = await network.connect(isManufacturer, isConsumer, id, 'supply');
     const contractRes = await network.query(networkObj, 'getHistory', productId);
 
     // const error = networkObj.error || contractRes.error;
@@ -95,7 +95,6 @@ exports.getLog = async (isManufacturer, isConsumer, information) => {
     // }
 
     // return apiResponse.createModelRes(200, 'Success', contractRes);
-    
     return {
         data: contractRes,
         key: 'getLog',

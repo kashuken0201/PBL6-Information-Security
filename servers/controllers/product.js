@@ -3,17 +3,14 @@ const productModel = require('../models/product');
 
 exports.createProduct = async (req, res) => {
     const { id, name, price, manuName, desc } = req.body.product;
-    // console.log('1');
 
     // if (!name || !id || !price || !loggedUserType) {
     //     return apiResponse.badRequest(res);
     // }
-    // console.log('2');
 
     // if (loggedUserType !== 'manufacturer') {
     //     return apiResponse.badRequest(res);
     // }
-    // console.log('3');
 
     const modelRes = await productModel.createProduct({ name, id, price, manuName, desc });
     res.send(modelRes);
@@ -26,28 +23,22 @@ exports.updateProduct = async (req, res) => {
     // if (!productId || !name || !id || !price || !loggedUserType || !role) {
     //     return apiResponse.badRequest(res);
     // }
-    // console.log('2');
 
     // if (loggedUserType === 'consumer') {
     //     return apiResponse.badRequest(res);
     // }
-    // console.log('3');
 
     const modelRes = await productModel.updateProduct({ productId, id, name, price, desc});
-
     res.send(modelRes);
 };
 
 exports.getProductbyId = async (req, res) => {
     const { id, productId, role } = req.params
 
-    // console.log('1');
-
     // if (!productId || !id || !role) {
     //     return apiResponse.badRequest(res);
     // }
-    // console.log('2');
-    // console.log('3');
+
     let modelRes = "";
     if (role === 'manufacturer') {
         modelRes = await productModel.getProductById(true, false, { productId, id });
@@ -60,13 +51,10 @@ exports.getProductbyId = async (req, res) => {
 exports.getAllProducts = async (req, res) => {
     const { id, role } = req.params
 
-    // console.log('1');
-
     // if (!id || !role) {
     //     return apiResponse.badRequest(res);
     // }
-    // console.log('2');
-    // console.log('3');
+
     let modelRes = "";
     if (role === 'manufacturer') {
         modelRes = await productModel.getAllProducts(true, false, { id });
@@ -79,13 +67,10 @@ exports.getAllProducts = async (req, res) => {
 exports.getLog = async (req, res) => {
     const { id, productId, role } = req.params
 
-    // console.log('1');
-
     // if (!id || !role) {
     //     return apiResponse.badRequest(res);
     // }
-    // console.log('2');
-    // console.log('3');
+
     let modelRes = "";
     if (role === 'manufacturer') {
         modelRes = await productModel.getLog(true, false, { productId, id });
