@@ -46,19 +46,19 @@ echo y | ./byfn.sh down
 echo y | ./byfn.sh up -a -n -s couchdb
 
 CONFIG_ROOT=/opt/gopath/src/github.com/hyperledger/fabric/peer
-ORG1_MSPCONFIGPATH=${CONFIG_ROOT}/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-ORG1_TLS_ROOTCERT_FILE=${CONFIG_ROOT}/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
-ORG2_MSPCONFIGPATH=${CONFIG_ROOT}/crypto/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp
-ORG2_TLS_ROOTCERT_FILE=${CONFIG_ROOT}/crypto/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt
-ORDERER_TLS_ROOTCERT_FILE=${CONFIG_ROOT}/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+MANUFACTURER_MSPCONFIGPATH=${CONFIG_ROOT}/crypto/peerOrganizations/manufacturer.milkain.com/users/Admin@manufacturer.milkain.com/msp
+MANUFACTURER_TLS_ROOTCERT_FILE=${CONFIG_ROOT}/crypto/peerOrganizations/manufacturer.milkain.com/peers/peer0.manufacturer.milkain.com/tls/ca.crt
+CONSUMER_MSPCONFIGPATH=${CONFIG_ROOT}/crypto/peerOrganizations/consumer.milkain.com/users/Admin@consumer.milkain.com/msp
+CONSUMER_TLS_ROOTCERT_FILE=${CONFIG_ROOT}/crypto/peerOrganizations/consumer.milkain.com/peers/peer0.consumer.milkain.com/tls/ca.crt
+ORDERER_TLS_ROOTCERT_FILE=${CONFIG_ROOT}/crypto/ordererOrganizations/milkain.com/orderers/orderer.milkain.com/msp/tlscacerts/tlsca.milkain.com-cert.pem
 set -x
 
-echo "Installing smart contract on peer0.org1.example.com"
+echo "Installing smart contract on peer0.manufacturer.milkain.com"
 docker exec \
-  -e CORE_PEER_LOCALMSPID=Org1MSP \
-  -e CORE_PEER_ADDRESS=peer0.org1.example.com:7051 \
-  -e CORE_PEER_MSPCONFIGPATH=${ORG1_MSPCONFIGPATH} \
-  -e CORE_PEER_TLS_ROOTCERT_FILE=${ORG1_TLS_ROOTCERT_FILE} \
+  -e CORE_PEER_LOCALMSPID=ManufacturerMSP \
+  -e CORE_PEER_ADDRESS=peer0.manufacturer.milkain.com:7051 \
+  -e CORE_PEER_MSPCONFIGPATH=${MANUFACTURER_MSPCONFIGPATH} \
+  -e CORE_PEER_TLS_ROOTCERT_FILE=${MANUFACTURER_TLS_ROOTCERT_FILE} \
   cli \
   peer chaincode install \
     -n supply \
@@ -66,12 +66,12 @@ docker exec \
     -p "$CC_SRC_PATH" \
     -l "$CC_RUNTIME_LANGUAGE"
 
-echo "Installing smart contract on peer0.org2.example.com"
+echo "Installing smart contract on peer0.consumer.milkain.com"
 docker exec \
-  -e CORE_PEER_LOCALMSPID=Org2MSP \
-  -e CORE_PEER_ADDRESS=peer0.org2.example.com:9051 \
-  -e CORE_PEER_MSPCONFIGPATH=${ORG2_MSPCONFIGPATH} \
-  -e CORE_PEER_TLS_ROOTCERT_FILE=${ORG2_TLS_ROOTCERT_FILE} \
+  -e CORE_PEER_LOCALMSPID=ConsumerMSP \
+  -e CORE_PEER_ADDRESS=peer0.consumer.milkain.com:9051 \
+  -e CORE_PEER_MSPCONFIGPATH=${CONSUMER_MSPCONFIGPATH} \
+  -e CORE_PEER_TLS_ROOTCERT_FILE=${CONSUMER_TLS_ROOTCERT_FILE} \
   cli \
   peer chaincode install \
     -n supply \
@@ -79,47 +79,48 @@ docker exec \
     -p "$CC_SRC_PATH" \
     -l "$CC_RUNTIME_LANGUAGE"
 
-echo "Instantiating smart contract on mychannel"
+echo "Instantiating smart contract on milkchannel"
 docker exec \
-  -e CORE_PEER_LOCALMSPID=Org1MSP \
-  -e CORE_PEER_MSPCONFIGPATH=${ORG1_MSPCONFIGPATH} \
+  -e CORE_PEER_LOCALMSPID=ManufacturerMSP \
+  -e CORE_PEER_MSPCONFIGPATH=${MANUFACTURER_MSPCONFIGPATH} \
   cli \
   peer chaincode instantiate \
-    -o orderer.example.com:7050 \
-    -C mychannel \
+    -o orderer.milkain.com:7050 \
+    -C milkchannel \
     -n supply \
     -l "$CC_RUNTIME_LANGUAGE" \
     -v 1.0 \
     -c '{"Args":[]}' \
-    -P "AND('Org1MSP.member','Org2MSP.member')" \
+    -P "AND('ManufacturerMSP.member','ConsumerMSP.member')" \
     --tls \
     --cafile ${ORDERER_TLS_ROOTCERT_FILE} \
-    --peerAddresses peer0.org1.example.com:7051 \
-    --tlsRootCertFiles ${ORG1_TLS_ROOTCERT_FILE}
+    --peerAddresses peer0.manufacturer.milkain.com:7051 \
+    --tlsRootCertFiles ${MANUFACTURER_TLS_ROOTCERT_FILE}
 
 echo "Waiting for instantiation request to be committed ..."
 sleep 10
 
-echo "Submitting initLedger transaction to smart contract on mychannel"
-echo "The transaction is sent to the two peers with the chaincode installed (peer0.org1.example.com and peer0.org2.example.com) so that chaincode is built before receiving the following requests"
+echo "Submitting initLedger transaction to smart contract on milkchannel"
+echo "The transaction is sent to the two peers with the chaincode installed (peer0.manufacturer.milkain.com and peer.consumer.milkain.com) so that chaincode is built before receiving the following requests"
 docker exec \
-  -e CORE_PEER_LOCALMSPID=Org1MSP \
-  -e CORE_PEER_MSPCONFIGPATH=${ORG1_MSPCONFIGPATH} \
+  -e CORE_PEER_LOCALMSPID=ManufacturerMSP \
+  -e CORE_PEER_MSPCONFIGPATH=${MANUFACTURER_MSPCONFIGPATH} \
   cli \
   peer chaincode invoke \
-    -o orderer.example.com:7050 \
-    -C mychannel \
+    -o orderer.milkain.com:7050 \
+    -C milkchannel \
     -n supply \
     -c '{"function":"initLedger","Args":[]}' \
     --waitForEvent \
     --tls \
     --cafile ${ORDERER_TLS_ROOTCERT_FILE} \
-    --peerAddresses peer0.org1.example.com:7051 \
-    --peerAddresses peer0.org2.example.com:9051 \
-    --tlsRootCertFiles ${ORG1_TLS_ROOTCERT_FILE} \
-    --tlsRootCertFiles ${ORG2_TLS_ROOTCERT_FILE}
+    --peerAddresses peer0.manufacturer.milkain.com:7051 \
+    --peerAddresses peer0.consumer.milkain.com:9051 \
+    --tlsRootCertFiles ${MANUFACTURER_TLS_ROOTCERT_FILE} \
+    --tlsRootCertFiles ${CONSUMER_TLS_ROOTCERT_FILE}
 set +x
-
+cd ../web-app/servers
+rm -rf identity
 cat <<EOF
 Total setup execution time : $(($(date +%s) - starttime)) secs ...
 EOF

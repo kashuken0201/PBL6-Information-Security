@@ -1,0 +1,48 @@
+{
+    "name": "first-network-consumer",
+    "version": "1.0.0",
+    "client": {
+        "organization": "Consumer",
+        "connection": {
+            "timeout": {
+                "peer": {
+                    "endorser": "300"
+                }
+            }
+        }
+    },
+    "organizations": {
+        "Consumer": {
+            "mspid": "ConsumerMSP",
+            "peers": [
+                "peer0.consumer.milkain.com"
+            ],
+            "certificateAuthorities": [
+                "ca.consumer.milkain.com"
+            ]
+        }
+    },
+    "peers": {
+        "peer0.consumer.milkain.com": {
+            "url": "grpcs://localhost:9051",
+            "tlsCACerts": {
+                "path": "/home/ubuntu/fabric-samples-v1/first-network/crypto-config/peerOrganizations/consumer.milkain.com/tlsca/tlsca.consumer.milkain.com-cert.pem"
+            },
+            "grpcOptions": {
+                "ssl-target-name-override": "peer0.consumer.milkain.com"
+            }
+        }
+     },
+    "certificateAuthorities": {
+        "ca.consumer.milkain.com": {
+            "url": "https://localhost:8054",
+            "caName": "ca-consumer",
+            "tlsCACerts": {
+                "path": "/home/ubuntu/fabric-samples-v1/first-network/crypto-config/peerOrganizations/consumer.milkain.com/tlsca/tlsca.consumer.milkain.com-cert.pem"
+            },
+            "httpOptions": {
+                "verify": false
+            }
+        }
+    }
+}
