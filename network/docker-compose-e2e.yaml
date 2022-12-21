@@ -1,0 +1,72 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: '2'
+
+volumes:
+  orderer.milkain.com:
+  peer0.manufacturer.milkain.com:
+  peer0.consumer.milkain.com:
+
+networks:
+  byfn:
+services:
+  ca0:
+    image: hyperledger/fabric-ca:$IMAGE_TAG
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca-manufacturer
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.manufacturer.milkain.com-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/2c1eb56c9bda69cdedcc99030ec1bb202ee3c08e493784d2051843ebd00d4a0c_sk
+    ports:
+      - "7054:7054"
+    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.manufacturer.milkain.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/2c1eb56c9bda69cdedcc99030ec1bb202ee3c08e493784d2051843ebd00d4a0c_sk -b admin:adminpw -d'
+    volumes:
+      - ./crypto-config/peerOrganizations/manufacturer.milkain.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    container_name: ca_manufacturer
+    networks:
+      - byfn
+
+  ca1:
+    image: hyperledger/fabric-ca:$IMAGE_TAG
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca-consumer
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.consumer.milkain.com-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/a45f82796ed912894ca011ef926470a957557be66f8a7f041d17fb7624a26bb8_sk
+    ports:
+      - "8054:7054"
+    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.consumer.milkain.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/a45f82796ed912894ca011ef926470a957557be66f8a7f041d17fb7624a26bb8_sk -b admin:adminpw -d'
+    volumes:
+      - ./crypto-config/peerOrganizations/consumer.milkain.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    container_name: ca_consumer
+    networks:
+      - byfn
+
+  orderer.milkain.com:
+    extends:
+      file:   base/docker-compose-base.yaml
+      service: orderer.milkain.com
+    container_name: orderer.milkain.com
+    networks:
+      - byfn
+
+  peer0.manufacturer.milkain.com:
+    container_name: peer0.manufacturer.milkain.com
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer0.manufacturer.milkain.com
+    networks:
+      - byfn
+
+  peer0.consumer.milkain.com:
+    container_name: peer0.consumer.milkain.com
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer0.consumer.milkain.com
+    networks:
+      - byfn
