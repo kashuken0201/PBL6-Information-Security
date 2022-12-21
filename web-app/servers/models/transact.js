@@ -67,12 +67,12 @@ exports.getAllTransact = async (isManufacturer, isConsumer, information) => {
     // return apiResponse.createModelRes(200, 'Success', contractRes);
     const res = [];
     contractRes.forEach(element => {
-        console.log(element.Record.OrderID)
         if (element.Record.OrderID !== "")
             res.push(element.Record)
     });
+    console.log(res)
     return {
-        data: contractRes,
+        data: res,
         key: 'getAllTransact',
     };
 };

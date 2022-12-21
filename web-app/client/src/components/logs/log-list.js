@@ -19,7 +19,7 @@ const LogList = (props) => {
         return (<div>
             {
                 isOpen && <Log
-                    product={props.product}
+                    product={logs[status].Value}
                     close={togglePopup}
                     status={logs[status].Value.Status}
                 />
@@ -37,7 +37,6 @@ const LogList = (props) => {
             isLoaded = true
         }
     }, [isLoaded])
-    
     return (
         <div className="popup-box">
             <div className="box-2">

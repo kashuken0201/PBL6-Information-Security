@@ -27,23 +27,29 @@ const BlockList = () => {
             return (
                 <div className="block-container" key={key}
                     index={index}>
+                    <div className="block-component">
                         <div className="arrow">
                             <AiOutlineDown size={"30px"} />
                         </div>
-                    <Block
-                        block={blocks[key]}
-                    />
+                        <Block
+                            block={blocks[key]}
+                            priv={key}
+                        />
+                    </div>
+                    <div id={key} className="json">
+                        <span>{JSON.stringify(blocks[key].Value)}</span>
+                    </div>
                 </div>
             )
         })
     }
-
+    console.log(blocks)
     return (
         <div>
             <AdminHeader />
-            <div className="container">
-                <h1>Blockchain</h1>
+            <div className="container1">
                 <div className="list-block">
+                    <h1 className="block-component text-center">Blockchain</h1>
                     {onLoad()}
                 </div>
             </div>

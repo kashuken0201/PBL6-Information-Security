@@ -1,15 +1,23 @@
-.container {
+.container1 {
+    width: 70%;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    margin-left: 28%;
 }
 
 .list-block {
-    padding-right: 20px;
     min-height: 500px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+}
+
+.block-container {
+    width: 100%;
+    display: flex;
+}
+
+.block-component {
+    width: 55%;
 }
 
 .title-block {
@@ -20,9 +28,6 @@
     padding: 10px;
 }
 
-.block-container {
-    width: 100%;
-}
 
 .block {
     width: 100%;
@@ -37,6 +42,7 @@
     margin-bottom: 20px;
     border-radius: 10px;
 }
+
 
 .arrow {
     margin-bottom: 20px;
@@ -82,6 +88,10 @@
     color: #52c41a;
 }
 
+.block-hash {
+    color: rgb(206, 137, 10);
+}
+
 .previous-hash>span {
     font-size: 13px;
     line-height: 24px;
@@ -93,19 +103,14 @@
 }
 
 .json {
+    width: 40%;
+    height: 235px;
     word-wrap: break-word;
-    width: 500px;
-    height: 600px;
-    /* display: flex;
-    flex-direction: column;
-    align-items: center; */
     background-color: white;
     border-bottom: 1px solid lightgray;
-    padding-bottom: 20px;
-    padding-right: 20px;
+    padding: 5px 20px 20px 10px;
+    margin: 50px 1% 20px 1%;
     box-shadow: 0px 0px 16px -8px rgba(0, 0, 0, 0.68);
-    margin-bottom: 20px;
-    border-radius: 10px;
     overflow-y: scroll;
     display: none;
 }

@@ -23,7 +23,6 @@ function getConnectionMaterial(isManufacturer, isConsumer) {
     }
 
     if (isConsumer) {
-        console.log(process.env.CONSUMER_WALLET);
         connectionMaterial.walletPath = path.join(process.cwd(), process.env.CONSUMER_WALLET);
         connectionMaterial.connection = consumerCcp;
         connectionMaterial.orgMSPID = process.env.CONSUMER_MSP;
@@ -40,6 +39,7 @@ exports.connect = async (isManufacturer, isConsumer, userID, contractName) => {
         const { walletPath, connection } = getConnectionMaterial(isManufacturer, isConsumer);
         const wallet = new FileSystemWallet(walletPath);
         const userExists = await wallet.exists(userID);
+
         if (!userExists) {
             console.error(`An identity for the user ${userID} does not exist in the wallet. Register ${userID} first`);
             return { status: 401, error: 'User identity does not exist in the wallet.' };
@@ -52,6 +52,7 @@ exports.connect = async (isManufacturer, isConsumer, userID, contractName) => {
 
         const network = await gateway.getNetwork(process.env.CHANNEL);
         const contract = await network.getContract(contractName);
+
         console.log('Connected to fabric network successly.');
 
         const networkObj = { gateway, network, contract };
@@ -64,39 +65,12 @@ exports.connect = async (isManufacturer, isConsumer, userID, contractName) => {
     }
 };
 
-// exports.queryChaincode = async (networkObj, ...funcAndArgs) => {
-//     try {
-//         console.log(`Query parameter: ${funcAndArgs}`);
-//         const funcAndArgsStrings = funcAndArgs.map(elem => String(elem));
-//         let response = await networkObj.contract.evaluateTransaction(...funcAndArgsStrings);
-//         response = BlockDecoder.decodeTransaction(response);
-//         console.log(`Transaction ${funcAndArgs} has been evaluated: ${response}`);
-
-//         return response;
-//     } catch (err) {
-//         console.error(`Failed to evaluate transaction: ${err}`);
-//         return { status: 500, error: err.toString() };
-//     } finally {
-//         if (networkObj.gatway) {
-//             await networkObj.gateway.disconnect();
-//         }
-//     }
-// };
-
 exports.queryChaincode = async (networkObj, ...funcAndArgs) => {
     try {
         console.log(`Query parameter: ${funcAndArgs}`);
         const funcAndArgsStrings = funcAndArgs.map(elem => String(elem));
         let response = await networkObj.contract.evaluateTransaction(...funcAndArgsStrings);
-        // response = BlockDecoder.decode(response);
-
-        const fs = require('fs')
-        fs.writeFileSync('./app/data/blockData.block', response)
-        const { exec } = require('child_process');
-        exec('sh ./app/block-decoder.sh')
-
-        response = fs.readFileSync('./app/data/block.json')
-        response = JSON.parse(response.toString('utf-8'))
+        response = BlockDecoder.decode(response)
         console.log(`Transaction ${funcAndArgs} has been evaluated: ${response}`);
 
         return response;
@@ -178,9 +152,6 @@ exports.registerUser = async (isManufacturer, isConsumer, userID) => {
 
     try {
         const { walletPath, connection, orgMSPID } = getConnectionMaterial(isManufacturer, isConsumer);
-
-        console.log(walletPath);
-        console.log(orgMSPID);
 
         const wallet = new FileSystemWallet(walletPath);
         const userExists = await wallet.exists(userID);

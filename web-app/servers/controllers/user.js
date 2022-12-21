@@ -1,13 +1,8 @@
 const authModel = require('../models/user.js');
-// const apiResponse = require('../utils/apiResponse.js');
 
 exports.signup = async (req, res) => {
-    const { userType, address, name, email, password } = req.body.user; // kashuken
+    const { userType, address, name, email, password } = req.body.user;
     const { role } = req.params;
-
-    // if ((!id || !userType || !address || !name || !email || !password)) {
-    //     return apiResponse.badRequest(res);
-    // }
 
     let modelRes = "";
     if (role === 'manufacturer') {
@@ -21,10 +16,6 @@ exports.signup = async (req, res) => {
 exports.signin = async (req, res) => {
     const { username, password, userType } = req.body;
     const { role } = req.params;
-
-    // if (!id || !password || !role) {
-    //     return apiResponse.badRequest(res);
-    // }
 
     let modelRes = "";
     if (role === 'manufacturer') {

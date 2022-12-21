@@ -3,10 +3,6 @@ const chaincodeModel = require('../models/chaincode');
 exports.getChainInfo = async (req, res) => {
     const { info, role } = req.params
 
-    // if (!productId || !id || !role) {
-    //     return apiResponse.badRequest(res);
-    // }
-
     let modelRes = "";
     if (role === 'manufacturer') {
         modelRes = await chaincodeModel.getChainInfo(true, false, info);
@@ -18,10 +14,6 @@ exports.getChainInfo = async (req, res) => {
 
 exports.getBlocks = async (req, res) => {
     const { role } = req.params
-
-    // if (!productId || !id || !role) {
-    //     return apiResponse.badRequest(res);
-    // }
 
     let modelRes = "";
     if (role === 'manufacturer') {
@@ -35,10 +27,6 @@ exports.getBlocks = async (req, res) => {
 exports.getBlockByHash = async (req, res) => {
     const { hash, role } = req.params
 
-    // if (!productId || !id || !role) {
-    //     return apiResponse.badRequest(res);
-    // }
-
     let modelRes = "";
     if (role === 'manufacturer') {
         modelRes = await chaincodeModel.getBlockByHash(true, false, hash);
@@ -51,10 +39,6 @@ exports.getBlockByHash = async (req, res) => {
 exports.getTransactionByID = async (req, res) => {
     const { id, role } = req.params
 
-    // if (!productId || !id || !role) {
-    //     return apiResponse.badRequest(res);
-    // }
-
     let modelRes = "";
     if (role === 'manufacturer') {
         modelRes = await chaincodeModel.getTransactionByID(true, false, id);
@@ -66,10 +50,6 @@ exports.getTransactionByID = async (req, res) => {
 
 exports.getBlockByTxID = async (req, res) => {
     const { txId, role } = req.params
-
-    // if (!productId || !id || !role) {
-    //     return apiResponse.badRequest(res);
-    // }
 
     let modelRes = "";
     if (role === 'manufacturer') {
